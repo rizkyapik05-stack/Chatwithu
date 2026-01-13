@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Chat 2 HP</title>
+  <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
+  <style>
+    body { font-family: Arial; padding: 10px; }
+    #chat { border:1px solid #ccc; height:250px; overflow:auto; padding:5px; }
+    input, button { width:100%; padding:10px; margin-top:5px; }
+  </style>
+</head>
+<body>
+
+<h3>Chat 2 HP (GitHub Pages)</h3>
+
+<p><b>ID kamu:</b> <span id="myid">...</span></p>
+
+<input id="target" placeholder="Masukkan ID teman">
+<button onclick="connect()">Hubungkan</button>
+
+<div id="chat"></div>
+
+<input id="pesan" placeholder="Ketik pesan">
+<button onclick="kirim()">Kirim</button>
+
+<script>
+  const peer = new Peer();
+  let conn;
+
+  peer.on('open', id => {
+    document.getElementById("myid").innerText = id;
+  });
+
+  peer.on('connection', c => {
+    conn = c;
+    conn.on('data', data => tampil("Teman", data));
+  });
+
+  function connect() {
+    const id = document.getElementById("target").value;
+    conn = peer.connect(id);
+    conn.on('data', data => tampil("Teman", data));
+  }
+
+  function kirim() {
+    const msg = document.getElementById("pesan").value;
+    if(conn && msg){
+      conn.send(msg);
+      tampil("Saya", msg);
+      document.getElementById("pesan").value = "";
+    }
+  }
+
+  function tampil(nama, msg){
+    document.getElementById("chat").innerHTML +=
+      `<p><b>${nama}:</b> ${msg}</p>`;
+  }
+</script>
+
+</body>
+</html>
